@@ -9,7 +9,7 @@ class AuthService {
   Future<Response> login(String email, String password) async {
     try {
       final response = await _apiClient.post('/auth/local', data: {
-        'email': email,
+        'identifier': email,
         'password': password,
       });
       return response;

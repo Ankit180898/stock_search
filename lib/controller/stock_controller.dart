@@ -7,7 +7,6 @@ import 'package:stock_search/service/stock_service.dart';
 class StockController extends GetxController {
   final StockService _stockService;
   
-  // Observable state
   final searchStocks = <SearchStockModel>[].obs;
   final stocks = <StockModel>[].obs;
   final isLoading = false.obs;
@@ -37,8 +36,6 @@ class StockController extends GetxController {
   Future<void> _performSearch(String query) async {
     try {
       isLoading.value = true;
-      errorMessage.value = '';
-
       final response = await _stockService.searchStocks(query);
       final List<dynamic> dataList = response.data;
       final results = dataList
@@ -48,7 +45,6 @@ class StockController extends GetxController {
       searchStocks.value = results;
     } catch (e, stacktrace) {
       debugPrint('Error searching stocks: $e\n$stacktrace');
-      errorMessage.value = 'Unable to search stocks. Please try again later.';
     } finally {
       isLoading.value = false;
     }

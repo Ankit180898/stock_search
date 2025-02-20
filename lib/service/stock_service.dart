@@ -24,15 +24,4 @@ class StockService {
       throw 'Failed to get stock details: ${e.toString()}';
     }
   }
-
-  Future<Response> getStockPriceGraph(String id, String range) async {
-    try {
-      return await _apiClient.get(
-        '/stocks/$id/price-graph',
-        queryParameters: {'range': range},
-      );
-    } catch (e) {
-      throw 'Failed to get price graph: ${e.toString()}';
-    }
-  }
 }

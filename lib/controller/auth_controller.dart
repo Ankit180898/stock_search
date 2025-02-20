@@ -1,14 +1,21 @@
+import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_search/model/user_model.dart';
 import 'package:stock_search/service/auth_service.dart';
 import '../core/storage_helper.dart';
 
 class AuthController extends GetxController {
+  var isVisible = false.obs;
   var isLoggedIn = false.obs; // Observable variable
-
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
   void toggleLogin() {
     isLoggedIn.value = !isLoggedIn.value; // Update observable
   }
+  void toggleVisibility() {
+    isVisible.value = !isVisible.value;
+  }
+
 
   final AuthService _authService;
   final isLoading = false.obs;

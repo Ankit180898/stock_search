@@ -14,7 +14,7 @@ class StockSearchView extends GetView<StockController> {
         slivers: [
           SliverAppBar(
             title: Text(
-              'Stocks Market App',
+              'Stocks Search',
               style: TextStyle(
                 color: Colors.black,
                 fontSize: 20,
