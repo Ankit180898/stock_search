@@ -5,18 +5,26 @@ import 'package:stock_search/service/auth_service.dart';
 import '../core/storage_helper.dart';
 
 class AuthController extends GetxController {
+
+  // Password visibility
   var isVisible = false.obs;
-  var isLoggedIn = false.obs; // Observable variable
+  var isLoggedIn = false.obs; 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  
   void toggleLogin() {
-    isLoggedIn.value = !isLoggedIn.value; // Update observable
+    isLoggedIn.value = !isLoggedIn.value; 
   }
   void toggleVisibility() {
     isVisible.value = !isVisible.value;
   }
 
-
+@override
+  void dispose() {
+    emailController.dispose();
+    passwordController.dispose();
+    super.dispose();
+  }
   final AuthService _authService;
   final isLoading = false.obs;
   final errorMessage = ''.obs;
@@ -36,6 +44,8 @@ class AuthController extends GetxController {
         await StorageHelper.saveToken(userData.token!);
         user.value = userData;
         Get.offAllNamed('/stocks');
+        emailController.clear();
+        passwordController.clear();
       } else {
         throw 'Token not found in response';
       }

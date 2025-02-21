@@ -33,19 +33,22 @@ dependencies:
   flutter:
     sdk: flutter
   get: ^4.7.2
+  google_fonts: ^6.2.1
   intl: ^0.20.2
+  logger: any
   shared_preferences: ^2.5.2
+  url_launcher: ^6.3.1
 
 dev_dependencies:
-  flutter_lints: ^5.0.0
   flutter_launcher_icons: ^0.14.3
+  flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
 
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/app_icon.png" 
+  image_path: "assets/app_icon.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -69,9 +72,9 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   # fonts:
-  #   - family: Schyler
+  #   - family: Roboto
   #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  #       - asset: assets/Roboto.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

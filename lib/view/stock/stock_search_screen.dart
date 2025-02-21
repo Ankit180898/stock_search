@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:stock_search/controller/auth_controller.dart';
 import 'package:stock_search/controller/stock_controller.dart';
+import 'package:stock_search/core/theme.dart';
 
 class StockSearchView extends GetView<StockController> {
   const StockSearchView({super.key});
@@ -9,56 +10,69 @@ class StockSearchView extends GetView<StockController> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey.shade100,
+      backgroundColor: AppTheme.backgroundColor,
       body: CustomScrollView(
         slivers: [
+          // AppBar with Search Field
           SliverAppBar(
             title: Text(
               'Stocks Search',
-              style: TextStyle(
-                color: Colors.black,
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
+              style: AppTheme.headline2.copyWith(color: AppTheme.textColor),
             ),
             actions: [
               IconButton(
                 onPressed: () {
                   Get.find<AuthController>().logout();
                 },
-                icon: Icon(Icons.logout),
+                icon: const Icon(Icons.logout, color: AppTheme.textColor),
               ),
             ],
             floating: true,
             pinned: true,
             expandedHeight: 120,
-            backgroundColor: Colors.white,
+            backgroundColor: AppTheme.cardColor,
             elevation: 0,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                color: Colors.white,
+                color: AppTheme.cardColor,
                 padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
                 alignment: Alignment.bottomCenter,
                 child: SafeArea(
-                  child: TextField(
-                    onChanged: (value) => controller.updateSearchQuery(value),
-                    decoration: InputDecoration(
-                      hintText: 'Search stocks, ETFs, mutual funds...',
-                      hintStyle: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 14,
+                  child: Obx(() {
+                    return ConstrainedBox(
+                      constraints: const BoxConstraints(maxWidth: 600), // Limit width
+                      child: TextField(
+                        controller: controller.searchController,
+                        onChanged: (value) => controller.updateSearchQuery(value),
+                        decoration: InputDecoration(
+                          hintText: 'Search stocks, ETFs, mutual funds...',
+                          hintStyle: AppTheme.caption.copyWith(
+                            color: Colors.grey.shade600,
+                          ),
+                          prefixIcon: Icon(
+                            Icons.search,
+                            color: Colors.grey.shade600,
+                          ),
+                          suffixIcon: controller.searchQuery.isNotEmpty
+                              ? IconButton(
+                                  icon: const Icon(Icons.clear),
+                                  onPressed: () {
+                                    controller.searchQuery.value = '';
+                                    controller.searchController.clear();
+                                  },
+                                )
+                              : null,
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 12,
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade100,
+                        ),
                       ),
-                      prefixIcon: Icon(
-                        Icons.search,
-                        color: Colors.grey.shade600,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
-                    ),
-                  ),
+                    );
+                  }),
                 ),
               ),
             ),
@@ -68,7 +82,11 @@ class StockSearchView extends GetView<StockController> {
           Obx(() {
             if (controller.isLoading.value) {
               return const SliverFillRemaining(
-                child: Center(child: CircularProgressIndicator()),
+                child: Center(
+                  child: CircularProgressIndicator(
+                    color: AppTheme.primaryColor,
+                  ),
+                ),
               );
             }
 
@@ -86,17 +104,14 @@ class StockSearchView extends GetView<StockController> {
                       const SizedBox(height: 16),
                       Text(
                         'Search for stocks',
-                        style: TextStyle(
-                          fontSize: 16,
+                        style: AppTheme.bodyText1.copyWith(
                           color: Colors.grey.shade600,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         'Try searching by company name or symbol',
-                        style: TextStyle(
-                          fontSize: 14,
+                        style: AppTheme.caption.copyWith(
                           color: Colors.grey.shade500,
                         ),
                       ),
@@ -117,7 +132,7 @@ class StockSearchView extends GetView<StockController> {
                     vertical: 8,
                   ),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: AppTheme.cardColor,
                     borderRadius: BorderRadius.circular(12),
                     boxShadow: [
                       BoxShadow(
@@ -132,45 +147,43 @@ class StockSearchView extends GetView<StockController> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(12),
                       onTap: () {
-                        Get.toNamed('/stock-details', arguments: stock.id);
+                        controller.selectedStock.value = null;
+                        Get.toNamed('/stock-details', arguments: stock);
                       },
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Row(
                           children: [
+                            // Stock Logo
                             Container(
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
                                 color: Colors.grey.shade100,
                                 borderRadius: BorderRadius.circular(12),
-                                image:
-                                    imgUrl != null
-                                        ? DecorationImage(
-                                          image: NetworkImage(imgUrl),
-                                          fit: BoxFit.cover,
-                                        )
-                                        : null,
-                              ),
-                              child:
-                                  imgUrl == null
-                                      ? Center(
-                                        child: Text(
-                                          stock.symbol
-                                                  ?.substring(0, 1)
-                                                  .toUpperCase() ??
-                                              '?',
-                                          style: TextStyle(
-                                            fontSize: 20,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.grey.shade700,
-                                          ),
-                                        ),
+                                image: imgUrl != null
+                                    ? DecorationImage(
+                                        image: NetworkImage(imgUrl),
+                                        fit: BoxFit.cover,
                                       )
-                                      : null,
+                                    : null,
+                              ),
+                              child: imgUrl == null
+                                  ? Center(
+                                      child: Text(
+                                        stock.symbol?.substring(0, 1).toUpperCase() ?? '?',
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.grey.shade700,
+                                        ),
+                                      ),
+                                    )
+                                  : null,
                             ),
                             const SizedBox(width: 16),
-                            // Info
+
+                            // Stock Info
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,8 +192,7 @@ class StockSearchView extends GetView<StockController> {
                                     children: [
                                       Text(
                                         stock.symbol ?? 'Unknown',
-                                        style: const TextStyle(
-                                          fontSize: 16,
+                                        style: AppTheme.bodyText1.copyWith(
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -192,14 +204,11 @@ class StockSearchView extends GetView<StockController> {
                                         ),
                                         decoration: BoxDecoration(
                                           color: Colors.grey.shade100,
-                                          borderRadius: BorderRadius.circular(
-                                            4,
-                                          ),
+                                          borderRadius: BorderRadius.circular(4),
                                         ),
                                         child: Text(
                                           stock.exchange ?? '',
-                                          style: TextStyle(
-                                            fontSize: 12,
+                                          style: AppTheme.caption.copyWith(
                                             color: Colors.grey.shade600,
                                           ),
                                         ),
@@ -209,20 +218,19 @@ class StockSearchView extends GetView<StockController> {
                                   const SizedBox(height: 4),
                                   Text(
                                     stock.name ?? '',
-                                    style: TextStyle(
-                                      fontSize: 14,
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: AppTheme.bodyText2.copyWith(
                                       color: Colors.grey.shade600,
                                     ),
                                   ),
-                                  if (stock.description?.isNotEmpty ??
-                                      false) ...[
+                                  if (stock.description?.isNotEmpty ?? false) ...[
                                     const SizedBox(height: 4),
                                     Text(
                                       stock.description!,
                                       maxLines: 2,
                                       overflow: TextOverflow.ellipsis,
-                                      style: TextStyle(
-                                        fontSize: 12,
+                                      style: AppTheme.caption.copyWith(
                                         color: Colors.grey.shade500,
                                       ),
                                     ),
