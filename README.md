@@ -1,6 +1,6 @@
 # Stock App
 
-![file cover - 4](https://github.com/user-attachments/assets/3806f5ef-fe23-4282-b0cc-a1b6fb82b547)
+![file cover - 4](https://github.com/user-attachments/assets/a5a729ec-9479-4549-9113-e560deb83932)
 
 A Flutter application that provides stock price and financial information, helping users make informed trading and investment decisions.
 
