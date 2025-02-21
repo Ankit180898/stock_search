@@ -4,7 +4,7 @@ A Flutter application that provides stock price and financial information, helpi
 
 ## Features
 
-- View stock prices and historical data
+- View stock prices
 - Access key statistics and expert ratings
 - ESG (Environmental, Social, and Governance) scores
 - User-friendly interface with responsive design

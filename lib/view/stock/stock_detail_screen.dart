@@ -431,7 +431,7 @@ class StockDetailView extends StatelessWidget {
             label,
             style: AppTheme.bodyText2.copyWith(color: Colors.grey.shade600),
           ),
-          label == 'Website'
+          label == 'Website' && value!='N/A'
               ? InkWell(
                 onTap: () async {
                   var url = value;
