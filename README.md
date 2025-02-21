@@ -16,13 +16,13 @@ A Flutter application that provides stock price and financial information, helpi
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/yourusername/stock-app.git
+   git clone https://github.com/Ankit180898/stock_search.git
    ```
 
 2. Navigate to the project directory:
 
    ```bash
-   cd stock-app
+   cd stock_search
    ```
 
 3. Install the dependencies:
