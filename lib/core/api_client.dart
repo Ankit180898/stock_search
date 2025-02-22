@@ -19,12 +19,13 @@ class ApiClient {
 
   void _setupInterceptors() {
     _dio.interceptors.add(dio.InterceptorsWrapper(
-      onRequest: (options, handler) {
+      onRequest: (options, handler) async {
         _logger.i('🔍 Request: ${options.method} ${options.path}');
         _logger.i('📝 Headers: ${options.headers}');
         _logger.i('📩 Data: ${options.data}');
 
-        final token = StorageHelper.getToken();
+        // If getToken() is synchronous, you may remove the await.
+        final token = await StorageHelper.getToken();
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }
@@ -62,11 +63,13 @@ class ApiClient {
 
     _logger.e('❌ Error: $errorMessage\n${e.message}');
     
-    Get.snackbar(
-      'Error',
-      errorMessage,
-      snackPosition: SnackPosition.BOTTOM,
-    );
+    if (Get.context != null) {
+      Get.snackbar(
+        'Error',
+        errorMessage,
+        snackPosition: SnackPosition.BOTTOM,
+      );
+    }
   }
 
   String _handleResponseError(int? statusCode) {
@@ -92,11 +95,11 @@ class ApiClient {
       _logger.i('📝 Query Parameters: $queryParameters');
       
       final response = await _dio.get(path, queryParameters: queryParameters);
-
       _logger.i('📥 Response (${response.statusCode}): ${response.data}');
       return response;
-    } catch (e) {
-      _logger.e('❌ GET Request Failed: $e');
+    } on dio.DioException catch (e) {
+      _logger.e('❌ GET Request Failed: ${e.message}');
+      _handleError(e);
       rethrow;
     }
   }
@@ -107,11 +110,11 @@ class ApiClient {
       _logger.i('📩 Data: $data');
 
       final response = await _dio.post(path, data: data);
-
       _logger.i('📥 Response (${response.statusCode}): ${response.data}');
       return response;
-    } catch (e) {
-      _logger.e('❌ POST Request Failed: $e');
+    } on dio.DioException catch (e) {
+      _logger.e('❌ POST Request Failed: ${e.message}');
+      _handleError(e);
       rethrow;
     }
   }
