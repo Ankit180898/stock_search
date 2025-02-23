@@ -6,40 +6,49 @@ import 'storage_helper.dart';
 
 class ApiClient {
   late dio.Dio _dio;
-  final Logger _logger = Logger(printer: PrettyPrinter());
-
+  final Logger _logger = Logger(
+    printer: PrettyPrinter(
+      errorMethodCount: 8, // Number of method calls if an error occurs
+      lineLength: 120, // Width of the output
+      colors: true, // Colorize the log messages
+      printEmojis: true, // Print emojis in the log
+    ),
+  );
   ApiClient() {
-    _dio = dio.Dio(dio.BaseOptions(
-      baseUrl: AppConstants.baseUrl,
-      responseType: dio.ResponseType.json,
-    ));
+    _dio = dio.Dio(
+      dio.BaseOptions(
+        baseUrl: AppConstants.baseUrl,
+        responseType: dio.ResponseType.json,
+      ),
+    );
 
     _setupInterceptors();
   }
 
   void _setupInterceptors() {
-    _dio.interceptors.add(dio.InterceptorsWrapper(
-      onRequest: (options, handler) async {
-        _logger.i('🔍 Request: ${options.method} ${options.path}');
-        _logger.i('📝 Headers: ${options.headers}');
-        _logger.i('📩 Data: ${options.data}');
+    _dio.interceptors.add(
+      dio.InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          _logger.i('🔍 Request: ${options.method} ${options.path}');
+          _logger.i('📝 Headers: ${options.headers}');
+          _logger.i('📩 Data: ${options.data}');
 
-        // If getToken() is synchronous, you may remove the await.
-        final token = await StorageHelper.getToken();
-        if (token != null) {
-          options.headers['Authorization'] = 'Bearer $token';
-        }
-        return handler.next(options);
-      },
-      onResponse: (response, handler) {
-        _logger.i('✅ Response (${response.statusCode}): ${response.data}');
-        return handler.next(response);
-      },
-      onError: (dio.DioException e, handler) {
-        _handleError(e);
-        return handler.next(e);
-      },
-    ));
+          final token = StorageHelper.getToken();
+          if (token != null) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+        onResponse: (response, handler) {
+          _logger.i('✅ Response (${response.statusCode}): ${response.data}');
+          return handler.next(response);
+        },
+        onError: (dio.DioException e, handler) {
+          _handleError(e);
+          return handler.next(e);
+        },
+      ),
+    );
   }
 
   void _handleError(dio.DioException e) {
@@ -56,19 +65,16 @@ class ApiClient {
         errorMessage = AppConstants.networkError;
     }
 
+    // Handle 401 Unauthorized error
     if (e.response?.statusCode == 401) {
       StorageHelper.clearToken();
       Get.offAllNamed('/login');
     }
 
     _logger.e('❌ Error: $errorMessage\n${e.message}');
-    
+
     if (Get.context != null) {
-      Get.snackbar(
-        'Error',
-        errorMessage,
-        snackPosition: SnackPosition.BOTTOM,
-      );
+      Get.snackbar('Error', errorMessage, snackPosition: SnackPosition.BOTTOM);
     }
   }
 
@@ -89,11 +95,14 @@ class ApiClient {
     }
   }
 
-  Future<dio.Response> get(String path, {Map<String, dynamic>? queryParameters}) async {
+  Future<dio.Response> get(
+    String path, {
+    Map<String, dynamic>? queryParameters,
+  }) async {
     try {
       _logger.i('📤 GET Request: $path');
       _logger.i('📝 Query Parameters: $queryParameters');
-      
+
       final response = await _dio.get(path, queryParameters: queryParameters);
       _logger.i('📥 Response (${response.statusCode}): ${response.data}');
       return response;
