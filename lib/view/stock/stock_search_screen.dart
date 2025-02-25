@@ -40,7 +40,7 @@ class StockSearchView extends GetView<StockController> {
                 child: SafeArea(
                   child: Obx(() {
                     return ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 600), // Limit width
+                      constraints: const BoxConstraints(maxWidth: 600), 
                       child: TextField(
                         controller: controller.searchController,
                         onChanged: (value) => controller.updateSearchQuery(value),
